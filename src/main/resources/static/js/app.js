@@ -67,20 +67,29 @@ async function fetchCategories() {
 
 async function createTask(taskData) {
     try {
+        console.log('Creating task with data:', taskData);
+        const payload = { task: taskData };
+        console.log('Sending payload:', JSON.stringify(payload));
+        
         const response = await fetch(TASKS_ENDPOINT, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Token ${getAuthToken()}`
             },
-            body: JSON.stringify(taskData)
+            body: JSON.stringify(payload)
         });
         
+        console.log('Response status:', response.status);
         if (response.ok) {
             const data = await response.json();
+            console.log('Response data:', data);
             tasks.unshift(data.task);
             renderTasks();
             return true;
+        } else {
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
         }
         return false;
     } catch (error) {
@@ -230,17 +239,24 @@ function formatTime(dateString) {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function initializeApp() {
+    console.log('Initializing TODO app...');
+    
     if (isAuthenticated()) {
         fetchTasks();
         fetchCategories();
     } else {
         window.location.href = '/login.html';
+        return;
     }
     
+    const taskForm = document.getElementById('task-form');
     if (taskForm) {
-        taskForm.addEventListener('submit', (e) => {
+        console.log('Attaching form submit listener...');
+        taskForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            console.log('Form submitted!');
+            
             const formData = new FormData(taskForm);
             const taskData = {
                 title: formData.get('title'),
@@ -251,9 +267,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 reminderDate: formData.get('reminderDate') || null
             };
             
-            createTask(taskData);
-            taskForm.reset();
+            console.log('Task data:', taskData);
+            
+            if (!taskData.title || taskData.title.trim() === '') {
+                alert('Please enter a task title');
+                return;
+            }
+            
+            const success = await createTask(taskData);
+            if (success) {
+                taskForm.reset();
+                console.log('Task created successfully!');
+            } else {
+                console.log('Task creation failed');
+            }
         });
+        console.log('Form submit listener attached successfully');
+    } else {
+        console.error('Task form not found!');
     }
     
     document.querySelectorAll('aside a').forEach(link => {
@@ -289,4 +320,12 @@ document.addEventListener('DOMContentLoaded', () => {
             fetchTasks(filterParam);
         });
     });
-});
+}
+
+document.addEventListener('DOMContentLoaded', initializeApp);
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+    initializeApp();
+}

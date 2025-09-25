@@ -1,5 +1,6 @@
 package io.spring.application.task;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
 import io.spring.core.task.TaskPriority;
 import io.spring.core.task.TaskStatus;
 import java.util.List;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 import org.joda.time.DateTime;
 
 @Getter
+@JsonRootName("task")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

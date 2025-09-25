@@ -97,7 +97,7 @@ public class TaskQueryService {
           countMap.put(item.getId(), item.getCount());
         });
     tasks.forEach(
-        taskData -> taskData.setImportantCount(countMap.get(taskData.getId())));
+        taskData -> taskData.setImportantCount(countMap.getOrDefault(taskData.getId(), 0)));
   }
 
   private void setIsImportant(List<TaskData> tasks, User currentUser) {

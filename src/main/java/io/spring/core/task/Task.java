@@ -49,7 +49,9 @@ public class Task {
     this.title = title;
     this.description = description;
     this.notes = notes;
-    this.categories = new HashSet<>(categoryList).stream().map(Category::new).collect(toList());
+    this.categories = categoryList != null ? 
+        new HashSet<>(categoryList).stream().map(Category::new).collect(toList()) : 
+        new java.util.ArrayList<>();
     this.status = status != null ? status : TaskStatus.TODO;
     this.priority = priority != null ? priority : TaskPriority.MEDIUM;
     this.dueDate = dueDate;
