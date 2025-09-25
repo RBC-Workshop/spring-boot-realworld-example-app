@@ -73,7 +73,7 @@ async function createTask(taskData) {
                 'Content-Type': 'application/json',
                 'Authorization': `Token ${getAuthToken()}`
             },
-            body: JSON.stringify({ task: taskData })
+            body: JSON.stringify(taskData)
         });
         
         if (response.ok) {
@@ -98,9 +98,7 @@ async function updateTaskStatus(taskId, completed) {
                 'Content-Type': 'application/json',
                 'Authorization': `Token ${getAuthToken()}`
             },
-            body: JSON.stringify({ 
-                task: { status } 
-            })
+            body: JSON.stringify({ status })
         });
         
         if (response.ok) {
@@ -246,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData(taskForm);
             const taskData = {
                 title: formData.get('title'),
-                description: formData.get('description') || '',
+                description: formData.get('description') || 'No description',
                 priority: formData.get('priority') || 'MEDIUM',
                 categoryList: formData.get('category') ? [formData.get('category')] : [],
                 dueDate: formData.get('dueDate') || null,
