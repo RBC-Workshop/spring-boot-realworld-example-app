@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.spring.infrastructure.mybatis.readservice.TaskImportantReadService">
+    <select id="isUserImportantTask" resultType="java.lang.Boolean">
+        select count(1) from important_tasks where user_id = #{userId} and task_id = #{taskId} limit 1
+    </select>
+
+    <select id="taskImportantCount" resultType="java.lang.Integer">
+        select count(1) from important_tasks where task_id = #{taskId}
+    </select>
+
+    <select id="tasksImportantCount" resultType="io.spring.application.data.TaskImportantCount">
+        select task_id as id, count(user_id) as count
+        from important_tasks
+        where task_id in
+        <foreach collection="taskIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        group by task_id
+    </select>
+
+    <select id="userImportantTasks" resultType="java.lang.String">
+        select task_id
+        from important_tasks
+        where task_id in
+        <foreach collection="taskIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        and user_id = #{currentUser.id}
+    </select>
+</mapper>

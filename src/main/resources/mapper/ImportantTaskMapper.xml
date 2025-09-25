@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.spring.infrastructure.mybatis.mapper.ImportantTaskMapper">
+    <insert id="insert">
+        insert into important_tasks (task_id, user_id) values (#{importantTask.taskId}, #{importantTask.userId})
+    </insert>
+
+    <select id="find" resultType="io.spring.core.task.ImportantTask">
+        select task_id as taskId, user_id as userId from important_tasks where task_id = #{taskId} and user_id = #{userId} limit 1
+    </select>
+
+    <delete id="remove">
+        delete from important_tasks where task_id = #{importantTask.taskId} and user_id = #{importantTask.userId}
+    </delete>
+</mapper>

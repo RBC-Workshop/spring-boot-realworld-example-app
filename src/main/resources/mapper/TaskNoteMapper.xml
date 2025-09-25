@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.spring.infrastructure.mybatis.mapper.TaskNoteMapper">
+    <insert id="insert">
+        insert into task_notes (id, body, task_id, user_id, created_at, updated_at) values (
+            #{taskNote.id}, #{taskNote.body}, #{taskNote.taskId}, #{taskNote.userId}, #{taskNote.createdAt}, #{taskNote.createdAt}
+        )
+    </insert>
+
+    <select id="findById" resultType="io.spring.core.task.TaskNote">
+        select id, body, task_id as taskId, user_id as userId, created_at as createdAt
+        from task_notes where id = #{id}
+    </select>
+
+    <delete id="remove">
+        delete from task_notes where id = #{id}
+    </delete>
+</mapper>

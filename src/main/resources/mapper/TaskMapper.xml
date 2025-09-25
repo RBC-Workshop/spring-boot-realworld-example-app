@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.spring.infrastructure.mybatis.mapper.TaskMapper">
+    <insert id="insert">
+        insert into tasks (id, user_id, title, description, notes, created_at, updated_at, status, priority, due_date, reminder_date) values (
+            #{task.id}, #{task.userId}, #{task.title}, #{task.description}, #{task.notes}, #{task.createdAt}, #{task.updatedAt},
+            #{task.status}, #{task.priority}, #{task.dueDate}, #{task.reminderDate}
+        )
+    </insert>
+
+    <update id="update">
+        update tasks
+        set title = #{task.title},
+            description = #{task.description},
+            notes = #{task.notes},
+            updated_at = #{task.updatedAt},
+            status = #{task.status},
+            priority = #{task.priority},
+            due_date = #{task.dueDate},
+            reminder_date = #{task.reminderDate}
+        where id = #{task.id}
+    </update>
+
+    <select id="findById" resultType="io.spring.core.task.Task">
+        select id, user_id, title, description, notes, created_at, updated_at, status, priority, due_date, reminder_date
+        from tasks where id = #{id}
+    </select>
+
+    <select id="findByTitle" resultType="io.spring.core.task.Task">
+        select id, user_id, title, description, notes, created_at, updated_at, status, priority, due_date, reminder_date
+        from tasks where title = #{title} limit 1
+    </select>
+
+    <delete id="remove">
+        delete from tasks where id = #{id}
+    </delete>
+</mapper>

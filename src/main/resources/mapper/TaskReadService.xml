@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.spring.infrastructure.mybatis.readservice.TaskReadService">
+    <sql id="selectTask">
+        select T.id as id,
+               T.title as title,
+               T.description as description,
+               T.notes as notes,
+               T.status as status,
+               T.priority as priority,
+               T.due_date as dueDate,
+               T.reminder_date as reminderDate,
+               T.created_at as createdAt,
+               T.updated_at as updatedAt,
+               T.user_id as userId,
+               U.username as userUsername,
+               U.bio as userBio,
+               U.image as userImage
+        from tasks T
+                 left join users U on T.user_id = U.id
+    </sql>
+
+    <select id="findById" resultMap="taskData">
+        <include refid="selectTask"/>
+        where T.id = #{id}
+    </select>
+
+    <select id="findTasks" resultMap="taskData">
+        <include refid="selectTask"/>
+        where T.id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="queryTasks" resultType="String">
+        select T.id
+        from tasks T
+        <if test="category != null">
+            inner join task_categories TC on T.id = TC.task_id
+            inner join categories C on TC.category_id = C.id and C.name = #{category}
+        </if>
+        where T.user_id = #{userId}
+        <if test="status != null">
+            and T.status = #{status}
+        </if>
+        <if test="priority != null">
+            and T.priority = #{priority}
+        </if>
+        <if test="dueBefore != null">
+            and T.due_date &lt; #{dueBefore}
+        </if>
+        order by T.created_at desc
+        limit #{page.limit} OFFSET #{page.offset}
+    </select>
+
+    <select id="countTask" resultType="Integer">
+        select count(T.id)
+        from tasks T
+        <if test="category != null">
+            inner join task_categories TC on T.id = TC.task_id
+            inner join categories C on TC.category_id = C.id and C.name = #{category}
+        </if>
+        where T.user_id = #{userId}
+        <if test="status != null">
+            and T.status = #{status}
+        </if>
+        <if test="priority != null">
+            and T.priority = #{priority}
+        </if>
+        <if test="dueBefore != null">
+            and T.due_date &lt; #{dueBefore}
+        </if>
+    </select>
+
+    <select id="findOverdueTasks" resultType="String">
+        select T.id
+        from tasks T
+        where T.user_id = #{userId}
+        and T.due_date &lt; #{now}
+        and T.status != 'COMPLETED'
+        and T.status != 'CANCELLED'
+        order by T.due_date asc
+    </select>
+
+    <select id="findTasksDueInRange" resultType="String">
+        select T.id
+        from tasks T
+        where T.user_id = #{userId}
+        and T.due_date >= #{start}
+        and T.due_date &lt; #{end}
+        and T.status != 'COMPLETED'
+        and T.status != 'CANCELLED'
+        order by T.due_date asc
+    </select>
+
+    <resultMap id="taskData" type="io.spring.application.data.TaskData">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="notes" property="notes"/>
+        <result column="status" property="status"/>
+        <result column="priority" property="priority"/>
+        <result column="dueDate" property="dueDate"/>
+        <result column="reminderDate" property="reminderDate"/>
+        <result column="createdAt" property="createdAt"/>
+        <result column="updatedAt" property="updatedAt"/>
+        <association property="profileData" javaType="io.spring.application.data.ProfileData">
+            <result column="userId" property="id"/>
+            <result column="userUsername" property="username"/>
+            <result column="userBio" property="bio"/>
+            <result column="userImage" property="image"/>
+        </association>
+        <collection property="categories" ofType="String">
+            <result column="categoryName"/>
+        </collection>
+    </resultMap>
+</mapper>
